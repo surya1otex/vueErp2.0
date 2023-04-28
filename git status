@@ -1,0 +1,151 @@
+warning: in the working copy of 'src/App.vue', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/Items.vue', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/App.vue b/src/App.vue[m
+[1mindex 849b9d3..8c9980d 100644[m
+[1m--- a/src/App.vue[m
+[1m+++ b/src/App.vue[m
+[36m@@ -4,5 +4,16 @@[m
+ </template>[m
+ [m
+ <script>[m
+[31m-export default {};[m
+[32m+[m[32mimport axios from 'axios';[m
+[32m+[m[32m//import { async } from 'q';[m
+[32m+[m[32mimport store from './store/store';[m
+[32m+[m[32mexport default {[m
+[32m+[m[32m   async created() {[m
+[32m+[m[32m   await axios.get('http://localhost:8000/api/items').then(response => {[m
+[32m+[m[32m                   store.state.items = response.data;[m
+[32m+[m[32m                   // this.users = response.data[m
+[32m+[m[32m                   //context.commit('setData', response.data);[m
+[32m+[m[32m                 });[m
+[32m+[m[32m   }[m
+[32m+[m[32m};[m
+ </script>[m
+[1mdiff --git a/src/pages/ItemDetails.vue b/src/pages/ItemDetails.vue[m
+[1mindex 88df17c..10df044 100644[m
+[1m--- a/src/pages/ItemDetails.vue[m
+[1m+++ b/src/pages/ItemDetails.vue[m
+[36m@@ -6,10 +6,11 @@[m
+     <md-table v-model="users" md-card>[m
+       <md-table-toolbar>[m
+         <h1 class="md-title">All Items</h1>[m
+[32m+[m[32m        {{ orditems }}[m
+       </md-table-toolbar>[m
+ [m
+       <md-table-row slot="md-table-row" slot-scope="{ item }">[m
+[31m-        <md-checkbox v-model="array" v-bind:value="item"></md-checkbox>[m
+[32m+[m[32m        <md-checkbox v-model="orditems" v-bind:value="item.id"></md-checkbox>[m
+         <md-table-cell>{{ item.name }}</md-table-cell>[m
+       </md-table-row>[m
+     </md-table>[m
+[36m@@ -32,7 +33,7 @@[m [mexport default {[m
+     itemID: Number[m
+    },[m
+    data: () => ({[m
+[31m-     array:[],[m
+[32m+[m[32m     orditems:[],[m
+      users:[],[m
+      items: [],[m
+      item: '',[m
+[36m@@ -41,8 +42,9 @@[m [mexport default {[m
+      description: '' [m
+    }),[m
+    created() {[m
+[32m+[m[32m    this.users = this.$store.state.items;[m
+      this.loadItemdata();[m
+[31m-     this.$store.dispatch('getAllitems');[m
+[32m+[m[32m    // this.$store.dispatch('getAllitems');[m
+ [m
+     //  axios.get('http://localhost:8000/api/items').then(response => {[m
+ [m
+[36m@@ -54,7 +56,7 @@[m [mexport default {[m
+ [m
+    },[m
+     computed: {[m
+[31m-      this.users = this.$store.getters.getData;[m
+[32m+[m[32m      //this.users = this.$store.getters.getData;[m
+     },[m
+    async mounted() {[m
+ [m
+[36m@@ -75,6 +77,13 @@[m [mexport default {[m
+         //axios.get('http://localhost:8000/api/items').then(response => {this.users = response.data });[m
+ [m
+ [m
+[32m+[m[32m    },[m
+[32m+[m[32m    showalert(e) {[m
+[32m+[m
+[32m+[m[32m      if (e.target.checked) {[m
+[32m+[m[32m        alert('checkbox checked');[m
+[32m+[m[32m    }[m
+[32m+[m[32m       //[m[41m [m
+     },[m
+      closepanelitem() {[m
+        // alert(this.itemID);[m
+[36m@@ -91,7 +100,7 @@[m [mexport default {[m
+         .then([m
+           function (response) {[m
+            // this.blocks = response.data;[m
+[31m-          // console.log(response);[m
+[32m+[m[32m           console.log(response);[m
+           this.item = response.data.name;[m
+           this.price = response.data.price;[m
+           this.instock = response.data.quantity;[m
+[1mdiff --git a/src/pages/Items.vue b/src/pages/Items.vue[m
+[1mindex dfb3391..93cd53d 100644[m
+[1m--- a/src/pages/Items.vue[m
+[1m+++ b/src/pages/Items.vue[m
+[36m@@ -13,6 +13,9 @@[m
+              <!-- <md-table-toolbar>[m
+               <h1 class="md-title">Items</h1>[m
+              </md-table-toolbar> -->[m
+[32m+[m[32m             <ul>[m
+[32m+[m[32m                <li v-for="item in $store.state.items" :key="item.id">{{ item.name }}</li>[m
+[32m+[m[32m             </ul>[m
+        <md-table-row slot="md-table-row" slot-scope="{ item }">[m
+         <md-table-cell md-label="Name" md-sort-by="Name" @click.native="showItem(item.id)">{{ item.name }}</md-table-cell>[m
+         <md-table-cell md-label="SKU" md-sort-by="SKU">{{ item.sku }}</md-table-cell>[m
+[36m@@ -71,7 +74,7 @@[m [mexport default {[m
+     },[m
+   },[m
+   data: () => ({[m
+[31m-      users: [],[m
+[32m+[m[32m     // users: [],[m
+       showList: true,[m
+       expand: false,[m
+       itemID: 3,[m
+[36m@@ -79,7 +82,7 @@[m [mexport default {[m
+       status: '',[m
+       loader: false,[m
+       table: true,[m
+[31m-      loading: true,[m
+[32m+[m[32m      //loading: true,[m
+       form: {[m
+         itemid:'',[m
+         itemName: '',[m
+[36m@@ -87,13 +90,21 @@[m [mexport default {[m
+         price:''[m
+       }[m
+     }),[m
+[31m-  mounted() {[m
+[31m-     this.getItems()[m
+[32m+[m[32m  async created() {[m
+[32m+[m[32m    // this.getItems()[m
+[32m+[m[32m   // this.users = await this.$store.state.items;[m
+[32m+[m[32m  },[m
+[32m+[m[32m  computed: {[m
+[32m+[m[32m    users() {[m
+[32m+[m[32m       return this.$store.state.items;[m
+[32m+[m[41m  [m
+[32m+[m[32m    }[m
+   },[m
+   methods: {[m
+     getItems() {[m
+[31m-       axios.get('http://localhost:8000/api/items').then(response => {this.users = response.data });[m
+[31m-       this.loading = false;[m
+[32m+[m[32m       //axios.get('http://localhost:8000/api/items').then(response => {this.users = response.data });[m
+[32m+[m[32m      // this.users = this.$store.state.items;[m
+[32m+[m[32m       //this.loading = false;[m
+     },[m
+     showItem(item) {[m
+       //alert('Product Info');[m
